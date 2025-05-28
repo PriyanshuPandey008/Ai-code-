@@ -13,7 +13,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5000',
-  'https://ai-code-d5cv.vercel.app' // ✅ Add your Vercel frontend domain here
+  'https://ai-code-frontend.vercel.app' // ✅ Add your Vercel frontend domain here
 ];
 
 const io = new Server(server, { // Initialize Socket.IO server
