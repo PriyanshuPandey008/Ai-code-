@@ -12,8 +12,7 @@ const server = http.createServer(app); // Create HTTP server from Express app
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
-  'http://localhost:5000',
-  'https://ai-code-frontend.vercel.app' // ✅ Add your Vercel frontend domain here
+  'https://ai-code-fz35.onrender.com' // ✅ Add your Vercel frontend domain here
 ];
 
 const io = new Server(server, { // Initialize Socket.IO server
