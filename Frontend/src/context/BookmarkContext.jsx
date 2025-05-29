@@ -44,7 +44,7 @@ export const BookmarkProvider = ({ children }) => {
       if (!token) {
         throw new Error('Authentication required');
       }
-
+ 
       await axios.post(
         `${config.API_URL}/api/bookmarks`,
         { projectId: project._id },
