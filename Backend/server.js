@@ -72,29 +72,14 @@ const connectDB = async () => {
     console.error('MongoDB connection error:', err);
     console.error('Error details:', {
       name: err.name,
-    });
-    if (process.env.NODE_ENV === 'development') {
-      process.exit(1);
-    }
+    });   
   }
 };
 
 // Initialize database connection
 connectDB();
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Promise Rejection:', err);
-  console.error('Error details:', {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    stack: err.stack
-  });
-  if (process.env.NODE_ENV === 'development') {
-    process.exit(1);
-  }
-});
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;
