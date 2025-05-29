@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 // CORS configuration for Express
 app.use(cors({
-  origin: true, // Allow all origins
+  origin: true, 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
@@ -52,18 +52,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  const status = err.status || 500;
-  const message = err.message || 'Something went wrong!';
-  res.status(status).json({ 
-    success: false,
-    message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-  });
-});
-
 // Connect to MongoDB with improved error handling
 const connectDB = async () => {
   try {
@@ -77,28 +65,12 @@ const connectDB = async () => {
     console.error('Error details:', {
       name: err.name,
     });
-    if (process.env.NODE_ENV === 'development') {
-      process.exit(1);
-    }
   }
 };
 
 // Initialize database connection
 connectDB();
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Promise Rejection:', err);
-  console.error('Error details:', {
-    name: err.name,
-    message: err.message,
-    code: err.code,
-    stack: err.stack
-  });
-  if (process.env.NODE_ENV === 'development') {
-    process.exit(1);
-  }
-});
 
 // Start the server 
 const PORT = process.env.PORT || 5000;
