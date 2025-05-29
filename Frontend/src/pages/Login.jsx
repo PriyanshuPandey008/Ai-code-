@@ -31,13 +31,18 @@ const Login = () => {
     localStorage.removeItem('email');
 
     try {
+      console.log('Attempting login with URL:', `${config.API_URL}/api/auth/login`);
+      console.log('Request data:', formData);
+      
       const response = await axios.post(`${config.API_URL}/api/auth/login`, formData, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        }
+        },
+        withCredentials: true
       });
 
+      console.log('Login response:', response.data);
       const data = response.data;
 
       if (data.token) {
@@ -53,7 +58,14 @@ const Login = () => {
         setError('Invalid response from server');
       }
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('Login error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        headers: err.response?.headers,
+        config: err.config
+      });
+      
       if (err.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
@@ -66,9 +78,11 @@ const Login = () => {
         }
       } else if (err.request) {
         // The request was made but no response was received
+        console.error('No response received. Request details:', err.request);
         setError('No response from server. Please check your internet connection.');
       } else {
         // Something happened in setting up the request that triggered an Error
+        console.error('Request setup error:', err.message);
         setError('An error occurred. Please try again.');
       }
     } finally {
