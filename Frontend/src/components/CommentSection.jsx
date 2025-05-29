@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import config from '../config';
+import axiosInstance from '../utils/axios';
 
 const CommentSection = ({ projectId, username }) => {
   const [comments, setComments] = useState([]);
@@ -14,7 +13,7 @@ const CommentSection = ({ projectId, username }) => {
     const fetchComments = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${config.API_URL}/api/comments/${projectId}`);
+        const res = await axiosInstance.get(`/api/comments/${projectId}`);
         setComments(res.data);
         setError(null);
       } catch (err) {
@@ -32,7 +31,7 @@ const CommentSection = ({ projectId, username }) => {
     if (!text.trim() || !projectId) return;
     setLoading(true);
     try {
-      const res = await axios.post(`${config.API_URL}/api/comments`, {
+      const res = await axiosInstance.post('/api/comments', {
         projectId,
         user: username,
         text: text.trim()
@@ -51,7 +50,7 @@ const CommentSection = ({ projectId, username }) => {
   const handleDelete = async (id) => {
     setLoading(true);
     try {
-      await axios.delete(`${config.API_URL}/api/comments/${id}`);
+      await axiosInstance.delete(`/api/comments/${id}`);
       setComments(comments.filter(c => c._id !== id));
       setError(null);
     } catch (err) {

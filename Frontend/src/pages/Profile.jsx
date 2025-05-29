@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaKey } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '../utils/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
@@ -24,9 +24,7 @@ const Profile = () => {
     // Fetch user data
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('https://ai-code-jivc.onrender.com/api/auth/user/profile', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await axiosInstance.get('/api/auth/user/profile');
         setUser(prev => ({
           ...prev,
           username: response.data.username
@@ -65,18 +63,11 @@ const Profile = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.put(
-        'https://ai-code-jivc.onrender.com/api/auth/user/updateProfile',
-        {
-          username: user.username,
-          currentPassword: user.currentPassword,
-          newPassword: user.newPassword
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await axiosInstance.put('/api/auth/user/updateProfile', {
+        username: user.username,
+        currentPassword: user.currentPassword,
+        newPassword: user.newPassword
+      });
 
       setMessage({
         text: 'Profile updated successfully',

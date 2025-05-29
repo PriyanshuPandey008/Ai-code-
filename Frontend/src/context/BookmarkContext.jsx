@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import config from '../config';
+import axiosInstance from '../utils/axios';
 
 const BookmarkContext = createContext();
 
@@ -23,11 +22,7 @@ export const BookmarkProvider = ({ children }) => {
         return;
       }
 
-      const response = await axios.get(`${config.API_URL}/api/bookmarks`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await axiosInstance.get('/api/bookmarks');
       setBookmarks(response.data);
       setError(null);
     } catch (err) {
@@ -40,21 +35,7 @@ export const BookmarkProvider = ({ children }) => {
 
   const addBookmark = async (project) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication required');
-      }
- 
-      await axios.post(
-        `${config.API_URL}/api/bookmarks`,
-        { projectId: project._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      
+      await axiosInstance.post('/api/bookmarks', { projectId: project._id });
       // Refresh bookmarks after adding
       await fetchBookmarks();
     } catch (err) {
@@ -65,17 +46,7 @@ export const BookmarkProvider = ({ children }) => {
 
   const removeBookmark = async (projectId) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication required');
-      }
-
-      await axios.delete(`${config.API_URL}/api/bookmarks/${projectId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
+      await axiosInstance.delete(`/api/bookmarks/${projectId}`);
       // Refresh bookmarks after removing
       await fetchBookmarks();
     } catch (err) {

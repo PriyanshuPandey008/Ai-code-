@@ -3,8 +3,7 @@ import Editor from "react-simple-code-editor";
 import prism from "prismjs";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
-import axios from 'axios';
-import config from '../config';
+import axiosInstance from '../utils/axios';
 import "prismjs/themes/prism-tomorrow.css";
 import "highlight.js/styles/github-dark.css";
 import { useProjects } from '../context/ProjectContext';
@@ -29,7 +28,7 @@ const CodeReview = () => {
     setLoading(true);
     setReview('');
     try {
-      const response = await axios.post(`${config.API_URL}/ai/get-review`, { code });
+      const response = await axiosInstance.post('/ai/get-review', { code });
       setReview(response.data);
     } catch (err) {
       setReview("Error fetching review. Please try again.");

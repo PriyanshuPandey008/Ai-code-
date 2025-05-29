@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import config from '../config';
+import axiosInstance from '../utils/axios';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,18 +30,7 @@ const Login = () => {
     localStorage.removeItem('email');
 
     try {
-      console.log('Attempting login with URL:', `${config.API_URL}/api/auth/login`);
-      console.log('Request data:', formData);
-      
-      const response = await axios.post(`${config.API_URL}/api/auth/login`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        withCredentials: true
-      });
-
-      console.log('Login response:', response.data);
+      const response = await axiosInstance.post('/api/auth/login', formData);
       const data = response.data;
 
       if (data.token) {
@@ -61,14 +49,10 @@ const Login = () => {
       console.error('Login error details:', {
         message: err.message,
         response: err.response?.data,
-        status: err.response?.status,
-        headers: err.response?.headers,
-        config: err.config
+        status: err.response?.status
       });
       
       if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         if (err.response.status === 500) {
           setError('Server error. Please try again later.');
         } else if (err.response.status === 401) {
@@ -77,12 +61,8 @@ const Login = () => {
           setError(err.response.data?.message || 'Login failed. Please try again.');
         }
       } else if (err.request) {
-        // The request was made but no response was received
-        console.error('No response received. Request details:', err.request);
         setError('No response from server. Please check your internet connection.');
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Request setup error:', err.message);
         setError('An error occurred. Please try again.');
       }
     } finally {

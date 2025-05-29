@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import config from '../config';
+import axiosInstance from '../utils/axios';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -32,13 +31,7 @@ const Signup = () => {
     localStorage.removeItem('email');
 
     try {
-      const response = await axios.post(`${config.API_URL}/api/auth/signup`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
+      const response = await axiosInstance.post('/api/auth/signup', formData);
       const data = response.data;
 
       if (data.token) {
@@ -56,20 +49,16 @@ const Signup = () => {
     } catch (err) {
       console.error('Signup error:', err);
       if (err.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         if (err.response.status === 500) {
           setError('Server error. Please try again later.');
-        } else if (err.response.status === 401) {
-          setError('Invalid credentials. Please try again.');
+        } else if (err.response.status === 400) {
+          setError(err.response.data.message || 'Invalid input. Please check your details.');
         } else {
           setError(err.response.data?.message || 'Signup failed. Please try again.');
         }
       } else if (err.request) {
-        // The request was made but no response was received
         setError('No response from server. Please check your internet connection.');
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError('An error occurred. Please try again.');
       }
     } finally {

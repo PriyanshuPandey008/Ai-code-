@@ -5,16 +5,27 @@ const cors = require('cors');
 
 const app = express();
 
+// Debug middleware
+app.use((req, res, next) => {
+  console.log('Incoming request:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    headers: req.headers
+  });
+  next();
+});
+
 // CORS configuration for Express
-const corsOptions = {
-  origin: '*', // Allow all origins
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,
-  maxAge: 86400 // 24 hours
-};
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
 // Welcome message route
