@@ -48,7 +48,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-
 // Connect to MongoDB with improved error handling
 const connectDB = async () => {
   try {
