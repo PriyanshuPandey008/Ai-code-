@@ -16,10 +16,28 @@ const ProjectCard = ({ project, onDelete }) => {
   const { bookmarks, addBookmark, removeBookmark } = useBookmarks();
   const isBookmarked = bookmarks.some(b => b._id === project._id);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
   const [error, setError] = useState(null);
 
   const handleOpenEditor = () => {
     navigate('/code-review', { state: { project } });
+  };
+
+  const handleBookmark = async () => {
+    try {
+      setIsBookmarking(true);
+      setError(null);
+      if (isBookmarked) {
+        await removeBookmark(project._id);
+      } else {
+        await addBookmark(project);
+      }
+    } catch (err) {
+      console.error('Error toggling bookmark:', err);
+      setError(err.response?.data?.message || 'Failed to update bookmark');
+    } finally {
+      setIsBookmarking(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -74,22 +92,22 @@ const ProjectCard = ({ project, onDelete }) => {
         <button 
           className="open-editor-btn" 
           onClick={handleOpenEditor}
-          disabled={isDeleting}
+          disabled={isDeleting || isBookmarking}
         >
           Open Editor
         </button>
         <button
           className="bookmark-btn"
-          onClick={() => isBookmarked ? removeBookmark(project._id) : addBookmark(project)}
-          disabled={isDeleting}
+          onClick={handleBookmark}
+          disabled={isDeleting || isBookmarking}
           style={{ marginTop: '0.5rem' }}
         >
-          {isBookmarked ? 'Remove Bookmark' : 'Bookmark'}
+          {isBookmarking ? 'Updating...' : isBookmarked ? 'Remove Bookmark' : 'Bookmark'}
         </button>
         <button
           className="delete-btn"
           onClick={handleDelete}
-          disabled={isDeleting}
+          disabled={isDeleting || isBookmarking}
           style={{ 
             marginTop: '0.5rem',
             backgroundColor: '#ff4444',
@@ -97,8 +115,8 @@ const ProjectCard = ({ project, onDelete }) => {
             border: 'none',
             padding: '8px 16px',
             borderRadius: '4px',
-            cursor: isDeleting ? 'not-allowed' : 'pointer',
-            opacity: isDeleting ? 0.7 : 1
+            cursor: (isDeleting || isBookmarking) ? 'not-allowed' : 'pointer',
+            opacity: (isDeleting || isBookmarking) ? 0.7 : 1
           }}
         >
           {isDeleting ? 'Deleting...' : 'Delete Project'}

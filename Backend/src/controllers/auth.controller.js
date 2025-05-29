@@ -12,7 +12,7 @@ const signup = async (req, res) => {
     });
 
     const { username, email, password } = req.body;
-    console.log('Signup attempt: extracted body');
+   
 
     // Input validation
     if (!username || !email || !password) {
@@ -45,15 +45,6 @@ const signup = async (req, res) => {
     }
     console.log('Signup attempt: password length validation passed');
 
-    // Check MongoDB connection
-    if (mongoose.connection.readyState !== 1) {
-      console.error('MongoDB is not connected. Current state:', mongoose.connection.readyState);
-      return res.status(500).json({
-        success: false,
-        message: 'Database connection error'
-      });
-    }
-    console.log('Signup attempt: MongoDB connection check passed');
 
     // Check for existing user
     console.log('Checking for existing user:', { email, username });

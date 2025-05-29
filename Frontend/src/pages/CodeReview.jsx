@@ -9,7 +9,6 @@ import "prismjs/themes/prism-tomorrow.css";
 import "highlight.js/styles/github-dark.css";
 import { useProjects } from '../context/ProjectContext';
 import { useLocation } from 'react-router-dom';
-import Chat from '../components/Chat';
 
 const CodeReview = () => {
   const location = useLocation();
@@ -100,7 +99,6 @@ const CodeReview = () => {
               <Markdown rehypePlugins={[rehypeHighlight]}>
                 {review}
               </Markdown>
-              {review && <Chat projectId={project?.id || 'default'} />}
             </div>
           )}
         </div>
