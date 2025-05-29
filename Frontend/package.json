@@ -18,8 +18,7 @@
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.22.1",
     "react-simple-code-editor": "^0.13.1",
-    "rehype-highlight": "^7.0.0",
-    "socket.io-client": "^4.7.4"
+    "rehype-highlight": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",

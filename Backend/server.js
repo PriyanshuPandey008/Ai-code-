@@ -56,6 +56,7 @@ app.use((err, req, res, next) => {
   res.status(status).json({ 
     success: false,
     message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 
@@ -72,7 +73,6 @@ const connectDB = async () => {
     console.error('Error details:', {
       name: err.name,
     });
-    // Don't exit the process in production
     if (process.env.NODE_ENV === 'development') {
       process.exit(1);
     }
@@ -82,7 +82,19 @@ const connectDB = async () => {
 // Initialize database connection
 connectDB();
 
-
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled Promise Rejection:', err);
+  console.error('Error details:', {
+    name: err.name,
+    message: err.message,
+    code: err.code,
+    stack: err.stack
+  });
+  if (process.env.NODE_ENV === 'development') {
+    process.exit(1);
+  }
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;
