@@ -30,10 +30,6 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add index for faster queries
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
-
 // Add error handling for duplicate key errors
 userSchema.post('save', function(error, doc, next) {
   if (error.name === 'MongoError' && error.code === 11000) {

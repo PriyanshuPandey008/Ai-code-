@@ -253,6 +253,15 @@ const updateProfile = async (req, res) => {
     console.log('Update profile attempt:', { userId: req.user._id });
     
     const { username, currentPassword, newPassword } = req.body;
+
+    // Validate that at least one field is being updated
+    if (!username && !currentPassword && !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'No fields provided for update'
+      });
+    }
+
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -263,8 +272,8 @@ const updateProfile = async (req, res) => {
       });
     }
 
-    // Check if username is already taken
-    if (username !== user.username) {
+    // Only check username if it's being updated
+    if (username && username !== user.username) {
       console.log('Checking username availability:', username);
       const existingUser = await User.findOne({ username });
       if (existingUser) {
@@ -274,9 +283,10 @@ const updateProfile = async (req, res) => {
           message: 'Username is already taken' 
         });
       }
+      user.username = username;
     }
 
-    // If changing password
+    // Only handle password update if both current and new passwords are provided
     if (currentPassword && newPassword) {
       console.log('Password change requested');
       
@@ -303,11 +313,12 @@ const updateProfile = async (req, res) => {
       console.log('Hashing new password');
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(newPassword, salt);
+    } else if ((currentPassword && !newPassword) || (!currentPassword && newPassword)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Both current password and new password are required to change password'
+      });
     }
-
-    // Update username
-    console.log('Updating username:', { old: user.username, new: username });
-    user.username = username;
     
     await user.save();
     console.log('Profile updated successfully');
@@ -317,16 +328,11 @@ const updateProfile = async (req, res) => {
       username: user.username 
     });
   } catch (error) {
-    console.error('Update profile error:', {
-      name: error.name,
-      message: error.message,
-      code: error.code,
-      stack: error.stack
-    });
+    console.error('Update profile error:', error);
     res.status(500).json({ 
       success: false,
       message: 'Error updating profile',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

@@ -1,41 +1,15 @@
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-
-const app = express();
+const { app, server } = require('./src/app');
 
 // Debug middleware
-app.use((req, res, next) => {
-  console.log('Incoming request:', {
-    method: req.method,
-    path: req.path,
-    origin: req.headers.origin,
-    headers: req.headers
-  });
-  next();
-});
-
-// CORS configuration for Express
-app.use(cors({
-  origin: true, 
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400
-}));
-
-app.use(express.json());
-
-// Welcome message route
-app.get('/', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: '🚀 Backend API is successfully deployed and running!',
-    status: 'active'
-  });
-});
+// ... existing code ...
+//   console.log('Incoming request:', {
+// ... existing code ...
+//     headers: req.headers
+// ... existing code ...
+//   });
+// ... existing code ...
 
 // Routes
 app.use('/ai', require('./src/routes/ai.routes'));
@@ -55,10 +29,7 @@ app.get('/health', (req, res) => {
 // Connect to MongoDB with improved error handling
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB connected successfully');
   } catch (err) {
     console.error('MongoDB connection error:', err);
@@ -71,11 +42,10 @@ const connectDB = async () => {
 // Initialize database connection
 connectDB();
 
-
 // Start the server 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-module.exports = app;
+module.exports = { app, server };
