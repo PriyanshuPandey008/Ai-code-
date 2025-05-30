@@ -1,5 +1,5 @@
 const config = {
-  API_URL: 'https://ai-code-jivc.onrender.com'
+  API_URL: 'http://localhost:5000'
 };
 
-export default config;
+export default config;  

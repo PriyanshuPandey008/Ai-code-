@@ -28,7 +28,7 @@ async function reviewCode(){
   setLoading(true); 
   setReview("");    
   try {
-    const response=await axios.post("https://ai-code-jivc.onrender.com/ai/get-review",{code});
+    const response=await axios.post(" http://localhost:5000/ai/get-review",{code});
     setReview(response.data);
   } catch (err) {
     setReview("Error fetching review.");

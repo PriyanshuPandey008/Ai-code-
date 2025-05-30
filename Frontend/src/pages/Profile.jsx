@@ -62,12 +62,32 @@ const Profile = () => {
       return;
     }
 
-    try {
-      const response = await axiosInstance.put('/api/auth/user/updateProfile', {
-        username: user.username,
-        currentPassword: user.currentPassword,
-        newPassword: user.newPassword
+    // Prepare update data - only include fields that are being updated
+    const updateData = {};
+    
+    // Always include username if it's not empty
+    if (user.username && user.username.trim()) {
+      updateData.username = user.username.trim();
+    }
+
+    // Only include password fields if both are provided
+    if (user.currentPassword && user.newPassword) {
+      updateData.currentPassword = user.currentPassword;
+      updateData.newPassword = user.newPassword;
+    }
+
+    // Check if there's anything to update
+    if (Object.keys(updateData).length === 0) {
+      setMessage({
+        text: 'No changes to update',
+        type: 'error'
       });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.put('/api/auth/user/updateProfile', updateData);
 
       setMessage({
         text: 'Profile updated successfully',
@@ -83,10 +103,11 @@ const Profile = () => {
       }));
 
       // Update localStorage username if changed
-      if (response.data.username !== localStorage.getItem('username')) {
+      if (response.data.username) {
         localStorage.setItem('username', response.data.username);
       }
     } catch (error) {
+      console.error('Profile update error:', error.response?.data);
       setMessage({
         text: error.response?.data?.message || 'Failed to update profile',
         type: 'error'

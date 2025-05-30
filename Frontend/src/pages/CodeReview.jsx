@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Editor from "react-simple-code-editor";
 import prism from "prismjs";
@@ -9,15 +9,14 @@ import "prismjs/themes/prism-tomorrow.css";
 import "highlight.js/styles/github-dark.css";
 import { useProjects } from '../context/ProjectContext';
 import { useLocation } from 'react-router-dom';
-import { FaHome, FaCode, FaFolder, FaBookmark, FaUser } from 'react-icons/fa';
+import { FaHome, FaCode, FaFolder, FaBookmark } from 'react-icons/fa';
+import GitHubPush from '../components/GitHubPush';
 
 const CodeReview = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const project = location.state?.project;
   const { addProject } = useProjects();
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const dropdownRef = useRef(null);
 
   const [code, setCode] = useState(project?.code || `function sum(){ 
   return 1+1
@@ -28,16 +27,6 @@ const CodeReview = () => {
 
   useEffect(() => {
     prism.highlightAll();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowProfileDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const reviewCode = async () => {
@@ -68,56 +57,55 @@ const CodeReview = () => {
     alert('Project added to dashboard!');
   };
 
-  const handleLogout = () => {
-    // Add logout logic here
-    navigate('/login');
-  };
-
   return (
     <div className="code-review-container">
       <header className="code-review-header">
         <div className="header-left">
-          <Link to="/dashboard" className="nav-link">
-            <FaHome /> <span className="logo-text"><span className="logo-code">Code</span><span className="logo-pilot">Pilot</span></span>
-          </Link>
-          <Link to="/code-review" className="nav-link active"><FaCode /> My Code Reviews</Link>
-          <Link to="/dashboard" className="nav-link"><FaFolder /> My Project</Link>
-          <Link to="/bookmarks" className="nav-link"><FaBookmark /> Bookmarks</Link>
-          <div className="dashboard-profile-group" ref={dropdownRef}>
-            <button 
-              className="profile-button-inline"
-              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-              type="button"
-            >
-              Hi, Arpit <span className="dropdown-arrow">👤▼</span>
-            </button>
-            {showProfileDropdown && (
-              <div className="dropdown-menu">
-                <Link to="/profile" className="dropdown-item">
-                  Update Profile
-                </Link>
-                <button onClick={handleLogout} className="dropdown-item">
-                  Logout
-                </button>
-              </div>
-            )}
+          <div className="nav-link">
+            <span className="logo-text">
+              <span className="logo-code">Code</span>
+              <span className="logo-pilot">Pilot</span>
+            </span>
+          </div>
+          <div className="code-review-nav">
+            <Link to="/dashboard" className="nav-link">
+              <FaHome /> Home
+            </Link>
+            <Link to="/code-review" className="nav-link active">
+              <FaCode /> Code Review
+            </Link>
+            <Link to="/dashboard" className="nav-link">
+              <FaFolder /> Projects
+            </Link>
+            <Link to="/bookmarks" className="nav-link">
+              <FaBookmark /> Bookmarks
+            </Link>
           </div>
         </div>
       </header>
       <main className="code-review-main">
         <div className="code-review-split">
           <div className="code-editor-container">
-            <Editor
-              value={code}
-              onValueChange={code => setCode(code)}
-              highlight={code => prism.highlight(code, prism.languages.javascript, "javascript")}
-              padding={10}
-              className="code-editor"
-              style={{
-                fontFamily: '"Fira code", "Fira Mono", monospace',
-                fontSize: 16,
-              }}
-            />
+            <div className="editor-wrapper">
+              <Editor
+                value={code}
+                onValueChange={code => setCode(code)}
+                highlight={code => prism.highlight(code, prism.languages.javascript, "javascript")}
+                padding={10}
+                className="code-editor"
+                style={{
+                  fontFamily: '"Fira code", "Fira Mono", monospace',
+                  fontSize: 16,
+                  height: '100%',
+                  overflow: 'auto',
+                  backgroundColor: '#1a1a1a',
+                  border: 'none',
+                  outline: 'none'
+                }}
+                textareaId="code-editor-textarea"
+                preClassName="code-editor-pre"
+              />
+            </div>
             <div className="code-review-actions">
               <button 
                 onClick={reviewCode}
@@ -134,6 +122,7 @@ const CodeReview = () => {
                 Add to My Projects
               </button>
             </div>
+            <GitHubPush code={code} projectName={project?.name || 'Untitled Project'} />
           </div>
           <div className="code-review-result">
             {loading ? (
